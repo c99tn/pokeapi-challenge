@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind utilities;
+@tailwind components;
+
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100&display=swap');
+
+@font-face {
+  font-family: "Pokemon";
+  src: url("../public/fonts/Pokemon.ttf");
+}
+
+@layer base{
+    body{
+        @apply bg-teal-600
+               text-white
+                font-thin;
+    }
+}
