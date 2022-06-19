@@ -19,6 +19,6 @@ Ready to start
         
       npm run dev
  
-Important : if you're using mongodb then make sure to replace the connection key with yours in the server.js file 
+Important : if you're going to try the app with your own mongo database then make sure to replace the connection key with yours in the server.js file 
 
       const mongourl= "YOUR_KEY_GOES_HERE";
