@@ -15,8 +15,9 @@ Install the dependencies
 
        npm install
 
-RUN !!
-       npm run dev ...
+Ready to start 
+        
+      npm run dev
  
 Important : if you're using mongodb then make sure to replace the connection key with yours in the server.js file 
 
