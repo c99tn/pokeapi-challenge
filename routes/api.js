@@ -1,49 +1,46 @@
 const express = require("express")  
 const Pokemon = require("../models/pokemon")
 
-//fetch every pokemon data saved in mongooo
+// fetch only 12 pokemons per request from data saved in mongoDB
 
 const router = express.Router();
 
 router.get('/poke',async (req,res)=>{
    
+    const page = parseInt(req.query.page);
+
+    const sid = (page-1)*12;
+    const eid = page *12;
+
+    const results = {};
+    
+    if(eid < 500){
+        results.next = {
+            page:page+1,
+            limit:12
+             }
+        }
+    
+     if(sid > 0){
+         results.previous = {
+             page:page-1,
+             limit:12
+            }
+        }
+
+    const pokemons = await Pokemon.find()
+     .limit(12)
+     .skip(sid)
+     .exec();
+
+     results.results = pokemons;
+     res.send(results);
+        
+     //console.log(pokemons);
      
-        
-        const page = parseInt(req.query.page);
-        const limit = parseInt(req.query.limit);
-
-
-        //  pagination config
-
-        const sid = (page-1)*limit;
-        const eid = page * limit;
-
-        const results = {};
-
-        if(eid < 500){
-            results.next = {
-                page:page+1,
-                limit:limit
-            }
-        }
-
-        // checking borders 0 and 500
-
-        if(sid > 0){
-            results.previous = {
-                page:page-1,
-                limit:limit
-            }
-        }
-        
-        await Pokemon.find({})
-        .then(rez=>{
-            results.results = rez.slice(sid,eid); 
-            res.send(results);
-            }
-        )
-  
+     //console.log(results);
 
     });
+
 
 module.exports = router;

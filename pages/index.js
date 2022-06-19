@@ -1,31 +1,28 @@
-import React from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { useInfiniteQuery } from "react-query";
-import Image from "next/image";
+import InfiniteScroll from 'react-infinite-scroll-component';
 import Head from "next/head";
-import Link from "next/link";
-//import useSWR from "swr";
-const { colors } = require('tailwindcss/defaultTheme')
+import Image from "next/image"
+import useSWRInfinite from 'swr/infinite'
+import axios from "axios";
 
-//fetch api 
-function Pokemon_List() {
-  const { data, status, fetchNextPage, hasNextPage } = useInfiniteQuery(
-    "InfinitePokemons",
-    async ({ pageParam = 1 }) =>
-      await fetch(
-        `/api/poke?page=${pageParam}&limit=12`
-      ).then((result) => result.json()),
-    {
-      getNextPageParam: (lastPage, pages) => {
-        if (lastPage.next) {
-          return pages.length + 1;
-        }
-        
-      },
-    }
-  );
-  return (
-    <div>
+
+function PokeApp() {
+
+    const fetcher = async (url) => await axios.get(url).then((res) => res.data);
+
+    const getKey = (pageIndex) => {
+        pageIndex += 1;
+        return `/api/poke?page=${pageIndex}`
+      }
+
+    const { data, size, setSize } = useSWRInfinite(getKey, fetcher);
+
+    const paginatedPosts = data?.flat();
+
+    const isReachedEnd = size > 42;
+
+      return (
+
+        <div>
 
         {/* Head */}
       <Head>
@@ -34,7 +31,7 @@ function Pokemon_List() {
           <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;700&display=swap" rel="stylesheet" />      </Head>
 
       {/* Header */}
-      <header className="py-10 mb-1 bg-teal-800">
+      <header className="py-10 mb-1 bg-red-400">
             
               <h1 className="text-center text-8xl">Pokemon</h1>
              <p className="font-Josefin text-center text-sm mt-5">BytecodeLabs Challenge</p>
@@ -43,15 +40,13 @@ function Pokemon_List() {
 
 
     <div className="container mx-auto">
-      {status === "success" && (
-        <InfiniteScroll
-          dataLength={data?.pages.length * 2}
-          next={fetchNextPage}
-          hasMore={hasNextPage}
-          loader={<h4>Catching more pokemons...</h4>}
-        >
+    
+    
+    <InfiniteScroll next={()=>setSize(size+1)} hasMore={!isReachedEnd} endMessage={<p className='text-center font-bold'><br></br>no more pokemons!</p>} 
+    dataLength={ paginatedPosts?.length ?? 0 } loader={<p className='text-center font-bold'><br></br>catching more pokemons ...</p>} >
+
           <div className='grid grid-cols-4 pt-10 pl-20 pr-10 gap-1 '>
-            {data?.pages.map((page) => (
+            {paginatedPosts?.map((page) => (
               <>
                 {page.results.map((pokemon) => (
                   <div className="" key={pokemon.id}>
@@ -59,7 +54,7 @@ function Pokemon_List() {
                     <div className=" pt-10 "></div>
                     {/* Pokemon card */}
 
-                   <div className="max-w-sm table-cell bg-teal-800 shadow-2xl rounded-xl">
+                   <div className="max-w-sm table-cell bg-red-400 shadow-2xl rounded-xl">
                     
                     <Image className=" object-center"
                                    alt={pokemon.name}
@@ -91,15 +86,18 @@ function Pokemon_List() {
               </>
             ))}
           </div>
-        </InfiniteScroll>
-      )}
+          </InfiniteScroll>
 
-
-
-
+{/*
+                    <br></br>
+                    {!isReachedEnd && <button onClick={}>Load more</button>}
+                    <br></br>
+*/}
+  
         </div>
     </div>
   );
 }
 
-export default Pokemon_List;
+ 
+export default PokeApp;
